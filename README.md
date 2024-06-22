@@ -20,10 +20,7 @@ Ensure you have OpenSSL installed on your system.
 
 ### Supported Distributions
 
-- Ubuntu
-- Debian
-- Kali Linux
-- Other Debian-based distributions
+Pasquale is supported by Debian-based systems, as well as CentOS. 
 
 ### Compilation
 
@@ -92,13 +89,12 @@ ftp target
 
 ### Abuse of syslog and vsftpd
 
-- **Syslog**: The rootkit hooks the `write` syscall to detect specific usernames logged by `syslog`. When detected, it triggers the appropriate backdoor, ensuring no logs are written.
+- **Syslog**: The rootkit hooks the `write` syscall to detect specific usernames logged by `syslog`. When detected, it triggers the appropriate backdoor and writes to `/dev/null`, ensuring no logs containing the usernames are written.
 - **vsftpd**: The `fopen` hook redirects writes to `/var/log/vsftpd.log` to `/dev/null`, ensuring the log file remains empty.
 
 ## Important Notes
 
 - **Educational Purposes**: This rootkit is intended for educational purposes only. Do not use it for malicious activities.
-- **System Impact**: Running this rootkit can have significant security implications. Use it in a controlled and legal environment.
 
 ## License
 
