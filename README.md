@@ -83,6 +83,7 @@ ftp target
 
 ### System Call Hooking
 
+- **LD_PRELOAD** LD_PRELOAD is an enviornamental variable (and also a file) that is checked before all other libraries. If set to the compiled rootkit library, all defined system calls in `pasquale.c` will be dynamically linked before the actual system calls. 
 - **write Hook**: Intercepts `write` calls to check for specific usernames. Depending on the username, it triggers a bind shell, reverse shell, or SSL-encrypted shell. The ssh and ftp processes both make write calls when a username is submitted. 
 - **fopen Hook**: Intercepts `fopen` calls to hide entries from `/var/log/vsftpd.log` and certain network connections from `netstat` and `lsof`.
 - **readdir Hook**: Intercepts directory reads to hide the rootkit's presence, including the `ls` command.
@@ -96,8 +97,3 @@ ftp target
 
 - **Educational Purposes**: This rootkit is intended for educational purposes only. Do not use it for malicious activities.
 
-## License
-
-This project is licensed under the MIT License.
-
----
