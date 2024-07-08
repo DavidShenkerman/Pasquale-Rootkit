@@ -8,7 +8,7 @@ Pasquale is a userland rootkit utilizing the `LD_PRELOAD` technique to hook syst
 
 ## Features
 
-- **Backdoor Access**: Provides two types of backdoors: bind shell, reverse shell, and SSL-encrypted shell, which can be triggered through both SSH and FTP.
+- **Backdoor Access**: Provides three types of backdoors: bind shell, reverse shell, and an SSL-encrypted shell, which can be triggered through both SSH and FTP.
 - **Log Manipulation**: Hides specific log entries from `vsftpd.log` and `auth.log`.
 - **Process Hiding**: Conceals specific connections from `netstat` and `lsof`.
 
